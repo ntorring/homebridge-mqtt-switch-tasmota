@@ -154,16 +154,20 @@ MqttSwitchTasmotaAccessory.prototype.getStatus = function(callback) {
 	if (this.activeStat) {
 		callback(null, this.switchStatus);
 	} else {
-		callback(null);		
+		callback("no_response");	
 	}
 }
 
 MqttSwitchTasmotaAccessory.prototype.setStatus = function(status, callback, context) {
-	if (context !== 'fromSetValue') {
-		this.switchStatus = status;
-		this.client.publish(this.topicStatusSet, status ? this.onValue : this.offValue, this.publish_options);
+	if (this.activeStat) {
+		if (context !== 'fromSetValue') {
+			this.switchStatus = status;
+			this.client.publish(this.topicStatusSet, status ? this.onValue : this.offValue, this.publish_options);
+		}
+		callback();
+	} else {
+		callback("no_response");		
 	}
-	callback();
 }
 
 MqttSwitchTasmotaAccessory.prototype.getStatusActive = function(callback) {
